@@ -8,15 +8,17 @@ description: |
   the config and logs them out to stdout.
 
 grade: devel
-confinement: strict
+confinement: devmode
 
 apps:
   daemon:
     command: bin/follower-cli
     daemon: oneshot
     timer: 00:00-24:00/1440  # every minute
-    plugs:
-      - snapd-control
+    # commented since snapd-control is a superprivileged plugin that requires
+    # manual review by the store, install as devmode
+    # plugs:
+    #   - snapd-control
 
 parts:
   follower:
