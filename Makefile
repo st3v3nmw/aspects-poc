@@ -41,7 +41,7 @@ define install
     $(eval $@_SNAP = $(1))
 	@echo "Installing ${$@_SNAP} snap..."
 	$(eval VERSION=$(shell yq ".version" ${$@_SNAP}/snap/snapcraft.yaml))
-	sudo snap install --dangerous ${$@_SNAP}/aspects-${$@_SNAP}_$(VERSION)_amd64.snap
+	sudo snap install --devmode ${$@_SNAP}/aspects-${$@_SNAP}_$(VERSION)_amd64.snap
 	snap connections aspects-${$@_SNAP} | awk '{print $$2}' | tail -n +2 | xargs -I {} sudo snap connect {}
 endef
 

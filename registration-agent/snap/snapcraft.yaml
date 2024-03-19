@@ -8,16 +8,18 @@ description: |
   devices and sync configuration.
 
 grade: devel
-confinement: strict
+confinement: devmode
 
 apps:
   daemon:
     command: bin/registration-agent-cli
     daemon: oneshot
     timer: 00:00-24:00/1440  # every minute
+    # commented since snapd-control is a superprivileged plugin that requires
+    # manual review by the store, install as devmode
     plugs:
-      - snapd-control
       - network
+      # - snapd-control
 
 parts:
   registration-agent:

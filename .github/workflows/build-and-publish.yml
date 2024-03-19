@@ -1,0 +1,27 @@
+name: Build and publish snaps
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build_and_publish:
+    strategy:
+      matrix:
+        component:
+          - "follower"
+          - "registration-agent"
+          - "server"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: snapcore/action-build@v1
+        id: build
+        with:
+          path: ${{ matrix.component }}
+      - uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          release: edge

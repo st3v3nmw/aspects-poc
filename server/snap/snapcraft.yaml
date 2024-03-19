@@ -7,7 +7,7 @@ description: |
   Server that can register devices and manage their config.
 
 grade: devel
-confinement: strict
+confinement: devmode
 
 apps:
   daemon:
