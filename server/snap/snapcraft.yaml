@@ -1,0 +1,27 @@
+name: aspects-server
+base: core22
+version: "0.1"
+license: GPL-2.0-only
+summary: Server that can register devices and manage their config.
+description: |
+  Server that can register devices and manage their config.
+
+grade: devel
+confinement: strict
+
+apps:
+  daemon:
+    command: bin/server-cli
+    daemon: simple
+    restart-condition: always
+    plugs:
+      - network-bind
+
+parts:
+  server:
+    plugin: python
+    source: .
+    parse-info:
+      - setup.py
+    python-packages:
+      - Flask==3.0.2

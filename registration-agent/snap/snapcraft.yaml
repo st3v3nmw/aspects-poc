@@ -1,0 +1,29 @@
+name: aspects-registration-agent
+base: core22
+version: "0.1"
+license: GPL-2.0-only
+summary: Snap that pulls and applies aspects config.
+description: |
+  This snap syncs with the registration server to register
+  devices and sync configuration.
+
+grade: devel
+confinement: strict
+
+apps:
+  daemon:
+    command: bin/registration-agent-cli
+    daemon: oneshot
+    timer: 00:00-24:00/1440  # every minute
+    plugs:
+      - snapd-control
+      - network
+
+parts:
+  registration-agent:
+    plugin: python
+    source: .
+    parse-info:
+      - setup.py
+    python-packages:
+      - snap-http==1.4.0
