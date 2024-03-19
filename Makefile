@@ -59,3 +59,18 @@ install-server:
 
 .PHONY: install-all
 install-all: install-follower install-registration-agent install-server
+
+
+# CLEAN UP
+
+define clean
+	$(eval $@_SNAP = $(1))
+	sudo snap remove aspects-${$@_SNAP}
+	rm ${$@_SNAP}/*.snap
+endef
+
+.PHONY: clean-all
+clean-all:
+	@$(call clean, "follower")
+	@$(call clean, "registration-agent")
+	@$(call clean, "server")

@@ -2,6 +2,21 @@
 
 A proof of concept for snap configuration sharing across snaps using snapd's aspects.
 
+## Installation
+
+The snaps are currently available from the Snap Store on the edge channel:
+
+```console
+$ sudo snap install aspects-follower --edge --devmode
+aspects-follower (edge) 0.1 from Stephen Mwangi (st3v3nmw) installed
+
+$ sudo snap install aspects-registration-agent --edge --devmode
+aspects-registration-agent (edge) 0.1 from Stephen Mwangi (st3v3nmw) installed
+
+$ sudo snap install aspects-server --edge --devmode
+aspects-server (edge) 0.1 from Stephen Mwangi (st3v3nmw) installed
+```
+
 ## Development
 
 ### Building the snaps
