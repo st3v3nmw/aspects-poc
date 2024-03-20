@@ -10,6 +10,9 @@ description: |
 grade: devel
 confinement: devmode
 
+environment:
+  ACCOUNT_ID: f22PSauKuNkwQTM9Wz67ZCjNACuSjjhN
+
 apps:
   daemon:
     command: bin/registration-agent-cli
@@ -29,3 +32,5 @@ parts:
       - setup.py
     python-packages:
       - snap-http==1.4.0
+      - requests==2.31.0
+      - cryptography==42.0.5
