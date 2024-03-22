@@ -1,25 +1,25 @@
 import os
 from typing import Any, Optional
 
-from snap_http.http import get, put
+from snap_http.http import get, put, SnapdHttpException
 
 
-def get_aspect(
-    name: str,
-    *,
-    fields: Optional[list[str]] = None,
-) -> dict:
-    """Get the aspect values."""
+def get_aspect(name: str, *, fields: Optional[list[str]] = None) -> dict:
+    """Get the aspect values (or a subset)."""
     query_params = {}
     if fields:
         query_params["fields"] = ",".join(fields)
 
-    account_id = os.environ["ACCOUNT_ID"]
-    response = get(
-        f"/aspects/{account_id}/aspects-poc/{name}",
-        query_params=query_params,
-    )
-    return response.result
+    try:
+        account_id = os.environ["ACCOUNT_ID"]
+        response = get(
+            f"/aspects/{account_id}/aspects-poc/{name}",
+            query_params=query_params,
+        )
+        return response.result
+    except SnapdHttpException:
+        # the aspect is empty
+        return {}
 
 
 def set_aspect(
@@ -32,3 +32,11 @@ def set_aspect(
         f"/aspects/{account_id}/aspects-poc/{name}",
         value,
     )
+
+
+def unset_aspect(name: str, *, fields: Optional[list[str]] = None) -> None:
+    """Unset an aspect (or a subset)."""
+    if fields is None:
+        fields = get_aspect(name).keys()
+
+    set_aspect(name, dict.fromkeys(fields, None))

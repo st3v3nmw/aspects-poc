@@ -3,7 +3,7 @@ from typing import Optional
 import requests
 import snap_http
 
-from src.aspects import get_aspect, set_aspect
+from src.aspects import get_aspect, set_aspect, unset_aspect
 from src.device import generate_keys, get_architecture, get_ip_address
 
 
@@ -39,7 +39,7 @@ def register(base_url: str) -> None:
 
     response = _make_request(
         "post",
-        base_url + "/register",
+        base_url + "/register/",
         {
             "ip-address": ip_address,
             "arch": arch,
@@ -60,11 +60,6 @@ def register(base_url: str) -> None:
         },
     )
 
-    set_aspect(
-        "snap-config",
-        _map_snap_config(result["snap-config"]),
-    )
-
     snap_http.set_conf(
         "aspects-registration-agent",
         {"is-registered": True},
@@ -74,20 +69,16 @@ def register(base_url: str) -> None:
 def poll(base_url: str) -> None:
     """Push the device's current config & pull changes if any."""
     snap_config = get_aspect("snap-config")
-    uid = get_aspect("device")["uid"]
+    uid = get_aspect("device", fields=["uid"])["uid"]
 
-    payload = {
-        "uuid": uid,
-        "config": snap_config,
-    }
+    payload = {"uuid": uid, "config": snap_config}
     response = _make_request(
         "post",
-        base_url + "/poll",
+        base_url + "/poll/",
         payload,
     )
 
     if response.status_code == 200:
-        set_aspect(
-            "snap-config",
-            _map_snap_config(response.json()),
-        )
+        config = response.json()["config"]
+        unset_aspect("snap-config")
+        set_aspect("snap-config", _map_snap_config(config))

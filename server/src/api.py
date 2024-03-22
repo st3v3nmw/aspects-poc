@@ -1,7 +1,7 @@
 import uuid
 
 from fastapi import APIRouter, HTTPException
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 
 from src import schemas, logic
 
@@ -32,7 +32,7 @@ async def poll(poll_request: schemas.PollRequest):
         raise HTTPException(status_code=400, detail=f"Not registered")
     rsp = logic.poll(poll_request.uuid, poll_request.config)
     if rsp is None:
-        return JSONResponse(status_code=204, content=None)
+        return Response(status_code=204)
     return rsp
 
 
