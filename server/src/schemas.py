@@ -36,3 +36,7 @@ class PollRequest(BaseModel):
 
 class PollResponse(BaseModel):
     config: ConfigDict
+
+
+class ErrorResponse(BaseModel):
+    detail: str
