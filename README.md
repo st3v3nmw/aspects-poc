@@ -61,27 +61,27 @@ After another minute or so, the `registration-agent` will poll the server to get
 ```console
 $ snap get f22PSauKuNkwQTM9Wz67ZCjNACuSjjhN/aspects-poc/snap-config -d
 {
-        "follower-1": {
+        "follower_1": {
                 "domain": "example.com",
                 "gzip": true,
                 "port": 3000,
                 "protocol": "https"
         },
-        "follower-2": {
+        "follower_2": {
                 "dsn": "postgresql://example.com:5432",
                 "flags": {
                         "autocommit": true,
                         "transaction_isolation": "REPEATABLE-READ"
                 }
         },
-        "follower-3": {
+        "follower_3": {
                 "logs": [
                         "/var/lib/landscape-client/broker.log",
                         "/var/lib/landscape-client/monitor.log",
                         "/var/lib/landscape-client/manager.log"
                 ]
         },
-        "follower-4": {
+        "follower_4": {
                 "telemetry": true
         }
 }
@@ -90,16 +90,16 @@ $ snap get f22PSauKuNkwQTM9Wz67ZCjNACuSjjhN/aspects-poc/snap-config -d
 Next, we'll update the config on the server by running the following `curl` command. Please note that `PUT` to `/target-config/` will replace the entire config.
 
 ```console
-$ curl -X PUT -H "Content-Type: application/json" -d '{"config": {"follower-1": {"domain": "staging.example.com"}, "follower-4": {"telemetry": false}}}' http://localhost:8000/target-config/
-{"config":{"follower-1":{"domain":"staging.example.com"},"follower-4":{"telemetry":false}}}%
+$ curl -X PUT -H "Content-Type: application/json" -d '{"config": {"follower": {"domain": "staging.example.com"}, "follower_4": {"telemetry": false}}}' http://localhost:8000/target-config/
+{"config":{"follower":{"domain":"staging.example.com"},"follower_4":{"telemetry":false}}}%
 
 $ curl -s http://localhost:8000/target-config/ | jq
 {
   "config": {
-    "follower-1": {
+    "follower": {
       "domain": "staging.example.com"
     },
-    "follower-4": {
+    "follower_4": {
       "telemetry": false
     }
   }
@@ -111,13 +111,29 @@ After some time, the `registration-agent` will poll the server once again and th
 ```console
 $ snap get f22PSauKuNkwQTM9Wz67ZCjNACuSjjhN/aspects-poc/snap-config -d
 {
-        "follower-1": {
+        "follower": {
                 "domain": "staging.example.com"
         },
-        "follower-4": {
+        "follower_4": {
                 "telemetry": false
         }
 }
+```
+
+And finally, the `follower` snaps will pick this up and log it to `stdout`:
+
+```console
+$ snap logs aspects-follower -n 10
+systemd[1]: Starting Service for snap application aspects-follower.daemon...
+aspects-follower.daemon[714184]: The current config is:
+aspects-follower.daemon[714184]:      {'follower': {'domain': 'staging.example.com'}}
+systemd[1]: snap.aspects-follower.daemon.service: Deactivated successfully.
+systemd[1]: Finished Service for snap application aspects-follower.daemon.
+systemd[1]: Starting Service for snap application aspects-follower.daemon...
+aspects-follower.daemon[714837]: The current config is:
+aspects-follower.daemon[714837]:      {'follower': {'domain': 'staging.example.com'}}
+systemd[1]: snap.aspects-follower.daemon.service: Deactivated successfully.
+systemd[1]: Finished Service for snap application aspects-follower.daemon.
 ```
 
 ## Server API documentation
@@ -180,26 +196,38 @@ You can check the snap logs for each component:
 
 ```console
 $ snap logs aspects-server -n 10
-2024-03-22T12:28:09+03:00 aspects-server.daemon[382257]: INFO:     127.0.0.1:37268 - "POST /poll/ HTTP/1.1" 200 OK
-2024-03-22T12:29:06+03:00 aspects-server.daemon[382257]: INFO:     127.0.0.1:49496 - "POST /poll/ HTTP/1.1" 200 OK
-2024-03-22T12:30:15+03:00 aspects-server.daemon[382257]: INFO:     127.0.0.1:51122 - "POST /poll/ HTTP/1.1" 200 OK
-2024-03-22T12:31:10+03:00 aspects-server.daemon[382257]: INFO:     127.0.0.1:47016 - "POST /poll/ HTTP/1.1" 200 OK
-2024-03-22T12:32:04+03:00 aspects-server.daemon[382257]: INFO:     127.0.0.1:37130 - "POST /poll/ HTTP/1.1" 200 OK
-2024-03-22T12:33:17+03:00 aspects-server.daemon[382257]: INFO:     127.0.0.1:41292 - "POST /poll/ HTTP/1.1" 200 OK
-2024-03-22T12:34:07+03:00 aspects-server.daemon[382257]: INFO:     127.0.0.1:47960 - "POST /poll/ HTTP/1.1" 200 OK
-2024-03-22T12:35:09+03:00 aspects-server.daemon[382257]: INFO:     127.0.0.1:44808 - "POST /poll/ HTTP/1.1" 200 OK
-2024-03-22T12:36:06+03:00 aspects-server.daemon[382257]: INFO:     127.0.0.1:46410 - "POST /poll/ HTTP/1.1" 200 OK
-2024-03-22T12:37:12+03:00 aspects-server.daemon[382257]: INFO:     127.0.0.1:40530 - "POST /poll/ HTTP/1.1" 200 OK
+aspects-server.daemon[382257]: INFO:     127.0.0.1:37268 - "POST /poll/ HTTP/1.1" 200 OK
+aspects-server.daemon[382257]: INFO:     127.0.0.1:49496 - "POST /poll/ HTTP/1.1" 200 OK
+aspects-server.daemon[382257]: INFO:     127.0.0.1:51122 - "POST /poll/ HTTP/1.1" 200 OK
+aspects-server.daemon[382257]: INFO:     127.0.0.1:47016 - "POST /poll/ HTTP/1.1" 200 OK
+aspects-server.daemon[382257]: INFO:     127.0.0.1:37130 - "POST /poll/ HTTP/1.1" 200 OK
+aspects-server.daemon[382257]: INFO:     127.0.0.1:41292 - "POST /poll/ HTTP/1.1" 200 OK
+aspects-server.daemon[382257]: INFO:     127.0.0.1:47960 - "POST /poll/ HTTP/1.1" 200 OK
+aspects-server.daemon[382257]: INFO:     127.0.0.1:44808 - "POST /poll/ HTTP/1.1" 200 OK
+aspects-server.daemon[382257]: INFO:     127.0.0.1:46410 - "POST /poll/ HTTP/1.1" 200 OK
+aspects-server.daemon[382257]: INFO:     127.0.0.1:40530 - "POST /poll/ HTTP/1.1" 200 OK
 
 $ snap logs aspects-registration-agent -n 10
-2024-03-22T12:35:08+03:00 systemd[1]: Starting Service for snap application aspects-registration-agent.daemon...
-2024-03-22T12:35:09+03:00 systemd[1]: snap.aspects-registration-agent.daemon.service: Deactivated successfully.
-2024-03-22T12:35:09+03:00 systemd[1]: Finished Service for snap application aspects-registration-agent.daemon.
-2024-03-22T12:36:05+03:00 systemd[1]: Starting Service for snap application aspects-registration-agent.daemon...
-2024-03-22T12:36:06+03:00 systemd[1]: snap.aspects-registration-agent.daemon.service: Deactivated successfully.
-2024-03-22T12:36:06+03:00 systemd[1]: Finished Service for snap application aspects-registration-agent.daemon.
-2024-03-22T12:37:10+03:00 systemd[1]: Starting Service for snap application aspects-registration-agent.daemon...
-2024-03-22T12:37:12+03:00 systemd[1]: snap.aspects-registration-agent.daemon.service: Deactivated successfully.
-2024-03-22T12:37:12+03:00 systemd[1]: Finished Service for snap application aspects-registration-agent.daemon.
-2024-03-22T12:37:12+03:00 systemd[1]: snap.aspects-registration-agent.daemon.service: Consumed 1.593s CPU time.
+systemd[1]: Starting Service for snap application aspects-registration-agent.daemon...
+systemd[1]: snap.aspects-registration-agent.daemon.service: Deactivated successfully.
+systemd[1]: Finished Service for snap application aspects-registration-agent.daemon.
+systemd[1]: Starting Service for snap application aspects-registration-agent.daemon...
+systemd[1]: snap.aspects-registration-agent.daemon.service: Deactivated successfully.
+systemd[1]: Finished Service for snap application aspects-registration-agent.daemon.
+systemd[1]: Starting Service for snap application aspects-registration-agent.daemon...
+systemd[1]: snap.aspects-registration-agent.daemon.service: Deactivated successfully.
+systemd[1]: Finished Service for snap application aspects-registration-agent.daemon.
+systemd[1]: snap.aspects-registration-agent.daemon.service: Consumed 1.593s CPU time.
+
+$ snap logs aspects-follower -n 10
+systemd[1]: Starting Service for snap application aspects-follower.daemon...
+aspects-follower.daemon[714184]: The current config is:
+aspects-follower.daemon[714184]:      {'follower': {'domain': 'staging.example.com'}}
+systemd[1]: snap.aspects-follower.daemon.service: Deactivated successfully.
+systemd[1]: Finished Service for snap application aspects-follower.daemon.
+systemd[1]: Starting Service for snap application aspects-follower.daemon...
+aspects-follower.daemon[714837]: The current config is:
+aspects-follower.daemon[714837]:      {'follower': {'domain': 'staging.example.com'}}
+systemd[1]: snap.aspects-follower.daemon.service: Deactivated successfully.
+systemd[1]: Finished Service for snap application aspects-follower.daemon.
 ```
