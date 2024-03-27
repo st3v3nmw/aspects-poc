@@ -44,6 +44,7 @@ def poll(registration_uuid: uuid.UUID, config: ConfigDict) -> Optional[schemas.P
     target_config = db.get_target_config()
     if not _is_config_matching_target(config, target_config.config):
         return schemas.PollResponse(config=target_config.config)
+    return None
 
 
 def _update_state(registration_uuid: uuid.UUID, config: ConfigDict) -> None:
