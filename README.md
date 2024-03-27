@@ -120,6 +120,10 @@ $ snap get f22PSauKuNkwQTM9Wz67ZCjNACuSjjhN/aspects-poc/snap-config -d
 }
 ```
 
+## Server API documentation
+
+While the server is running (corresponding snap has been installed), documentation is available at [127.0.0.1:8000/docs](127.0.0.1:8000/docs).
+
 ## Development
 
 Make sure you've installed the PoC using the installation script above to make sure that all assertions are acknowledged and experimental features like aspects are turned on.
