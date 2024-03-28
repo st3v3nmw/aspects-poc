@@ -173,3 +173,49 @@ def test_poll_config_does_not_match():
             "follower-4": {"telemetry": False},
         },
     )
+
+
+def test_poll_config_matches():
+    def _mock_snap_response(path, method, **kwargs):
+        if "device" in path:
+            result = {
+                "architecture": "amd64",
+                "ip-address": "192.168.0.106",
+                "public-rsa-key": "some public rsa key",
+                "registered": 1711613131,
+                "uid": "b6b53f82-b892-43a7-9d90-09b7479c7a5d",
+            }
+        else:
+            # snap-config
+            result = {
+                "follower": {"domain": "staging.example.com"},
+                "follower_4": {"telemetry": True},
+            }
+        return {
+            "type": "sync",
+            "status_code": 200,
+            "status": "OK",
+            "result": result,
+            "sources": None,
+            "change": None,
+            "warning_timestamp": None,
+            "warning_count": None,
+        }
+
+    snap_http.http._make_request.side_effect = _mock_snap_response
+
+    requests.request.return_value = TestResponse(204, text="No Content")
+
+    poll("http://localhost:8000")
+
+    requests.request.assert_called_once_with(
+        "post",
+        "http://localhost:8000/poll/",
+        json={
+            "uuid": "b6b53f82-b892-43a7-9d90-09b7479c7a5d",
+            "config": {
+                "follower": {"domain": "staging.example.com"},
+                "follower_4": {"telemetry": True},
+            },
+        },
+    )
