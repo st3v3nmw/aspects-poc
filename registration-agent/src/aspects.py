@@ -39,4 +39,9 @@ def unset_aspect(name: str, *, fields: Optional[list[str]] = None) -> None:
     if fields is None:
         fields = get_aspect(name).keys()
 
-    set_aspect(name, dict.fromkeys(fields, None))
+    try:
+        set_aspect(name, dict.fromkeys(fields, None))
+    except SnapdHttpException:
+        # the aspect does not exist
+        # removing non-existent aspects will cause errors
+        pass

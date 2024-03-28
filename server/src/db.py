@@ -29,7 +29,7 @@ def update_state(registration_uuid: uuid.UUID, state: schemas.State) -> None:
 
 def _create_or_update_state(registration_uuid: uuid.UUID, state: schemas.State) -> None:
     with open(f"{DB}/state_{registration_uuid}.json", "w") as f:
-        json.dump(state.dict(), f, indent=JSON_INDENT)
+        json.dump(state.model_dump(), f, indent=JSON_INDENT)
 
 
 def get_state(registration_uuid: uuid.UUID) -> schemas.State:

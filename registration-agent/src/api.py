@@ -71,7 +71,11 @@ def poll(base_url: str) -> None:
     snap_config = get_aspect("snap-config")
     uid = get_aspect("device", fields=["uid"])["uid"]
 
-    payload = {"uuid": uid, "config": snap_config}
+    payload = {
+        "uuid": uid,
+        # undo what _map_snap_config did while storing the aspects
+        "config": {k.replace("-", "_"): v for k, v in snap_config.items()},
+    }
     response = _make_request(
         "post",
         base_url + "/poll/",

@@ -10,6 +10,9 @@ description: |
 grade: devel
 confinement: devmode
 
+environment:
+  ACCOUNT_ID: f22PSauKuNkwQTM9Wz67ZCjNACuSjjhN
+
 apps:
   daemon:
     command: bin/follower-cli

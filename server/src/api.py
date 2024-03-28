@@ -12,9 +12,7 @@ router = APIRouter()
 @router.put(
     "/target-config/",
     response_model=schemas.Config,
-    responses={
-        200: {"description": "Updated target configuration"}
-    }
+    responses={200: {"description": "Updated target configuration"}},
 )
 async def update_target_config(config: schemas.Config) -> schemas.Config:
     logic.update_target_config(config.config)
@@ -24,9 +22,7 @@ async def update_target_config(config: schemas.Config) -> schemas.Config:
 @router.get(
     "/target-config/",
     response_model=schemas.Config,
-    responses={
-        200: {"description": "Returned target configuration"}
-    }
+    responses={200: {"description": "Returned target configuration"}},
 )
 async def get_target_config() -> schemas.Config:
     rsp = logic.get_target_config()
@@ -36,12 +32,12 @@ async def get_target_config() -> schemas.Config:
 @router.post(
     "/register/",
     response_model=schemas.RegisterResponse,
-    responses={
-        200: {"description": "Registered agent"}
-    }
+    responses={200: {"description": "Registered agent"}},
 )
-async def register(register_request: schemas.RegisterRequest) -> schemas.RegisterResponse:
-    rsp = logic.register(**register_request.dict())
+async def register(
+    register_request: schemas.RegisterRequest,
+) -> schemas.RegisterResponse:
+    rsp = logic.register(**register_request.model_dump())
     return rsp
 
 
@@ -51,8 +47,8 @@ async def register(register_request: schemas.RegisterRequest) -> schemas.Registe
     responses={
         200: {"description": "Polled with agent configuration not matching target"},
         204: {"description": "Polled with agent configuration matching target"},
-        400: {"description": "Agent not registered", "model": schemas.ErrorResponse}
-    }
+        400: {"description": "Agent not registered", "model": schemas.ErrorResponse},
+    },
 )
 async def poll(poll_request: schemas.PollRequest) -> PollResponse | Response:
     if not logic.is_registered(poll_request.uuid):
@@ -68,8 +64,11 @@ async def poll(poll_request: schemas.PollRequest) -> PollResponse | Response:
     response_model=schemas.State,
     responses={
         200: {"description": "Returned agent state"},
-        400: {"description": "Agent registration not found", "model": schemas.ErrorResponse}
-    }
+        400: {
+            "description": "Agent registration not found",
+            "model": schemas.ErrorResponse,
+        },
+    },
 )
 async def get_state(registration_uuid: uuid.UUID) -> schemas.State:
     if not logic.is_registered(registration_uuid):
